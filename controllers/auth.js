@@ -1,6 +1,20 @@
 const bcrypt = require('bcryptjs');
 
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+
 const Usuario = require("../models/usuario");
+
+const APIKEY = 'AQUI VIENE EL API KEY';
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key:
+        APIKEY
+    }
+  })
+);
 
 
 exports.getIngresar = (req, res, next) => {
@@ -87,6 +101,15 @@ exports.postRegistrarse = (req, res, next) => {
         })
         .then(result => {
           res.redirect('/ingresar');
+          return transporter.sendMail({
+            to: email,
+            from: 'jcabelloc@itana.pe', // Corresponde al email verificado en Sendgrid
+            subject: 'Registro Exitoso!!',
+            html: '<h1>Se ha dado de alta satisfactoriamente!</h1>'
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
     })
     .catch(err => {
